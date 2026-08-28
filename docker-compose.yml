@@ -1,0 +1,8 @@
+services:
+    dummy:
+        image: dockette/dummy
+        ports:
+            - 3000:3000
+        environment:
+            - MCP_WHO=dummy
+            - MCP_PORT=3000
