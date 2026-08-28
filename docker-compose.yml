@@ -1,6 +1,6 @@
 services:
     dummy:
-        image: dockette/dummy
+        image: dockette/dummy:mcp
         ports:
             - 3000:3000
         environment:

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Dummy MCP server (Bun) published as `dockette/dummy`.
+Dummy Docker images for testing, published as `dockette/dummy`.
 
 ## Writing style
 
@@ -13,8 +13,11 @@ Dummy MCP server (Bun) published as `dockette/dummy`.
 
 ## Conventions
 
-- Keep the server small. It is a demo image, not a product.
-- One source file: `src/server.ts`. Tools go in `createServer()`.
+- One folder per variant. The folder name is the Docker tag (`mcp/` -> `dockette/dummy:mcp`).
+- Keep every variant small. These are demo images, not products.
+- `mcp/`: one source file, `src/server.ts`. Tools go in `createServer()`.
 - Pin the Bun version in the `Dockerfile` (`oven/bun:<version>-alpine`).
-- `bun test` covers the server over HTTP. `make test-docker` covers the image.
+- `make test` runs the unit tests. `make test-docker` smoke tests the image.
 - Run `make test` and `make build test-docker` before you commit.
+- A new variant needs a folder, a `Dockerfile`, and an entry in the `image` matrix in
+  `.github/workflows/docker.yml`.

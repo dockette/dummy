@@ -1,7 +1,7 @@
 <h1 align=center>Dockette / Dummy</h1>
 
 <p align=center>
-   🐳 Dummy <a href="https://modelcontextprotocol.io">MCP</a> server with 2 tools. Built with <a href="https://bun.sh">Bun</a>.
+   🐳 Dummy Docker images for testing. Start with <code>dockette/dummy:mcp</code>, an <a href="https://modelcontextprotocol.io">MCP</a> server with 2 tools.
 </p>
 
 <p align=center>
@@ -19,23 +19,33 @@
 
 ## Motivation
 
-`dockette/dummy` is a minimal MCP server in a container. Use it to test an MCP client, a gateway,
-or a proxy, without a real backend. It answers 2 questions only: who it is and what time it is.
+`dockette/dummy` holds small images that do almost nothing. Use them to test a client, a gateway,
+or a proxy, without a real backend.
 
-The server speaks the [Streamable HTTP](https://modelcontextprotocol.io/specification/basic/transports)
+Every image is published to Docker Hub as [`dockette/dummy`](https://hub.docker.com/r/dockette/dummy),
+one tag per variant. Each variant lives in its own folder in this repository.
+
+| Tag                    | Folder  | Description                                    |
+| ---------------------- | ------- | ---------------------------------------------- |
+| **`mcp`**              | `mcp/`  | MCP server with 2 tools, built with [Bun](https://bun.sh). |
+
+## `dockette/dummy:mcp`
+
+A minimal MCP server. It answers 2 questions only: who it is and what time it is. The server
+speaks the [Streamable HTTP](https://modelcontextprotocol.io/specification/basic/transports)
 transport on `/mcp` in stateless mode.
 
-## Tools
+### Tools
 
 | Tool     | Arguments | Returns                                             |
 | -------- | --------- | --------------------------------------------------- |
 | `whoami` | none      | The value of the `MCP_WHO` environment variable.     |
 | `time`   | none      | The current time as an ISO-8601 timestamp (UTC).     |
 
-## Usage
+### Usage
 
 ```bash
-docker run --rm -p 3000:3000 -e MCP_WHO=alice dockette/dummy
+docker run --rm -p 3000:3000 -e MCP_WHO=alice dockette/dummy:mcp
 ```
 
 Or with Docker Compose:
@@ -43,7 +53,7 @@ Or with Docker Compose:
 ```yaml
 services:
     dummy:
-        image: dockette/dummy
+        image: dockette/dummy:mcp
         ports:
             - 3000:3000
         environment:
@@ -71,14 +81,14 @@ curl -sS http://localhost:3000/mcp \
     -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"whoami","arguments":{}}}'
 ```
 
-## Configuration
+### Configuration
 
 | Variable   | Default | Description                              |
 | ---------- | ------- | ---------------------------------------- |
 | `MCP_WHO`  | `dummy` | The text that the `whoami` tool returns.  |
 | `MCP_PORT` | `3000`  | The HTTP port that the server listens on. |
 
-## Endpoints
+### Endpoints
 
 | Endpoint  | Method | Description                       |
 | --------- | ------ | --------------------------------- |
@@ -87,16 +97,21 @@ curl -sS http://localhost:3000/mcp \
 
 ## Development
 
+Every target works on one variant. `DOCKER_VARIANT` selects it and defaults to `mcp`.
+
 ```bash
 make install      # install dependencies (bun)
 make dev          # run the server with a file watcher
 make test         # run the tests (bun test)
 make typecheck    # run the TypeScript compiler
 
-make build        # build the Docker image
+make build        # build the Docker image (dockette/dummy:mcp)
 make test-docker  # smoke test the Docker image
 make push         # build and push a multi-arch image to Docker Hub
 ```
+
+Add a variant with a new folder and a `Dockerfile` in it, then add the folder name to the
+`image` matrix in [`.github/workflows/docker.yml`](.github/workflows/docker.yml).
 
 See [how to contribute](https://contributte.org/contributing.html) to this package.
 

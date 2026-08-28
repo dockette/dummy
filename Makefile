@@ -1,36 +1,37 @@
 DOCKER_IMAGE=dockette/dummy
-DOCKER_TAG?=latest
+DOCKER_VARIANT?=mcp
+DOCKER_TAG?=$(DOCKER_VARIANT)
 DOCKER_PLATFORMS?=linux/amd64,linux/arm64
 
 MCP_PORT?=3000
 
 .PHONY: install
 install:
-	bun install --frozen-lockfile
+	cd ${DOCKER_VARIANT} && bun install --frozen-lockfile
 
 .PHONY: test
 test:
-	bun test
+	cd ${DOCKER_VARIANT} && bun test
 
 .PHONY: typecheck
 typecheck:
-	bun run typecheck
+	cd ${DOCKER_VARIANT} && bun run typecheck
 
 .PHONY: start
 start:
-	bun run start
+	cd ${DOCKER_VARIANT} && bun run start
 
 .PHONY: dev
 dev:
-	bun run dev
+	cd ${DOCKER_VARIANT} && bun run dev
 
 .PHONY: build
 build:
-	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+	docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_VARIANT}/
 
 .PHONY: push
 push:
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
+	docker buildx build --platform ${DOCKER_PLATFORMS} -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push ${DOCKER_VARIANT}/
 
 .PHONY: run
 run:
@@ -40,7 +41,7 @@ run:
 .PHONY: test-docker
 test-docker:
 	docker run --rm -d --name dummy-smoke -p 13000:3000 -e MCP_WHO=smoke ${DOCKER_IMAGE}:${DOCKER_TAG}
-	MCP_URL=http://127.0.0.1:13000 ./tests/smoke.sh; \
+	MCP_URL=http://127.0.0.1:13000 ./${DOCKER_VARIANT}/tests/smoke.sh; \
 	status=$$?; \
 	docker rm -f dummy-smoke > /dev/null; \
 	exit $$status

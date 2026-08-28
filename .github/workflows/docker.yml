@@ -13,8 +13,12 @@ permissions:
 
 jobs:
   build:
-    name: "Build"
+    name: "Build (${{ matrix.image }})"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [mcp]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -25,20 +29,20 @@ jobs:
           bun-version: 1.3.14
 
       - name: Install dependencies
-        run: make install
+        run: make install DOCKER_VARIANT=${{ matrix.image }}
 
       - name: Typecheck
-        run: make typecheck
+        run: make typecheck DOCKER_VARIANT=${{ matrix.image }}
 
       - name: Test
-        run: make test
+        run: make test DOCKER_VARIANT=${{ matrix.image }}
 
       # Builds into the local Docker daemon, so no export or import step
       - name: Build image
-        run: make build
+        run: make build DOCKER_VARIANT=${{ matrix.image }}
 
       - name: Smoke test image
-        run: make test-docker
+        run: make test-docker DOCKER_VARIANT=${{ matrix.image }}
 
       - name: Login to DockerHub
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -57,7 +61,7 @@ jobs:
 
       - name: Push image
         if: ${{ github.ref == 'refs/heads/master' }}
-        run: make push
+        run: make push DOCKER_VARIANT=${{ matrix.image }}
 
   docs:
     name: "Docs"
