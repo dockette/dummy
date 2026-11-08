@@ -95,6 +95,15 @@ curl -sS http://localhost:3000/mcp \
 | `/mcp`    | `POST` | MCP Streamable HTTP transport.    |
 | `/health` | `GET`  | Health check. Returns `200` JSON. |
 
+## Versions
+
+| Tag                             | Description                          |
+| ------------------------------- | ------------------------------------ |
+| `dockette/dummy:mcp`            | latest build of `master`             |
+| `dockette/dummy:mcp-YYYY.MM.DD` | `mcp` image of release `YYYY.MM.DD`  |
+
+There is no `latest` tag; pick a variant. Releases are listed on [GitHub](https://github.com/dockette/dummy/releases).
+
 ## Development
 
 Every target works on one variant. `DOCKER_VARIANT` selects it and defaults to `mcp`.
@@ -107,7 +116,9 @@ make typecheck    # run the TypeScript compiler
 
 make build        # build the Docker image (dockette/dummy:mcp)
 make test-docker  # smoke test the Docker image
-make push         # build and push a multi-arch image to Docker Hub
+make push         # build and push a multi-arch image to Docker Hub, with all tags
+make version      # print VERSION
+make release      # set today's date in VERSION
 ```
 
 Add a variant with a new folder and a `Dockerfile` in it, then add the folder name to the
