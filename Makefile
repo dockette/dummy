@@ -1,7 +1,13 @@
+include VERSION
+
 DOCKER_IMAGE=dockette/dummy
 DOCKER_VARIANT?=mcp
 DOCKER_TAG?=$(DOCKER_VARIANT)
 DOCKER_PLATFORMS?=linux/amd64,linux/arm64
+
+# One build, two tags per variant: <variant> and <variant>-<date>. There is no `latest`,
+# because the repository holds several variants.
+DOCKER_PUSH_TAGS=-t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:${DOCKER_TAG}-${VERSION}
 
 MCP_PORT?=3000
 
@@ -31,7 +37,16 @@ build:
 
 .PHONY: push
 push:
-	docker buildx build --platform ${DOCKER_PLATFORMS} -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push ${DOCKER_VARIANT}/
+	docker buildx build --platform ${DOCKER_PLATFORMS} ${DOCKER_PUSH_TAGS} --push ${DOCKER_VARIANT}/
+
+.PHONY: version
+version:
+	@echo ${VERSION}
+
+.PHONY: release
+release:
+	@sed -i.bak "s/^VERSION=.*/VERSION=$$(date -u +%Y.%m.%d)/" VERSION && rm VERSION.bak
+	@cat VERSION
 
 .PHONY: run
 run:

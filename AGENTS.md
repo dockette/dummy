@@ -21,3 +21,12 @@ Dummy Docker images for testing, published as `dockette/dummy`.
 - Run `make test` and `make build test-docker` before you commit.
 - A new variant needs a folder, a `Dockerfile`, and an entry in the `image` matrix in
   `.github/workflows/docker.yml`.
+
+## Versions
+
+- `VERSION` holds the release date (`VERSION=YYYY.MM.DD`). `make release` sets it to today (UTC).
+  `make version` prints it.
+- A push to `master` pushes two tags per variant: `<variant>` and `<variant>-<date>` (for example `mcp`
+  and `mcp-<date>`). There is no `latest` or bare `<date>` tag, because the repository holds several
+  variants. It also creates the GitHub release `<date>`, if it does not exist.
+- To release, run `make release`, commit `VERSION`, and merge to `master`.
